@@ -2,10 +2,16 @@
 
 A full-stack news blog application built with React, TypeScript, Vite, and Convex.
 
-## Architecture
+## Technical Stack
 
-- **Frontend:** React + TypeScript + Vite (located in `src/`)
+- **Frontend:** React 18 + TypeScript + Vite (located in `src/`)
 - **Backend:** Convex (located in `convex/`)
+- **Styling:** Tailwind CSS + tailwindcss-animate
+- **UI Components:** Lucide React icons, Recharts, class-variance-authority
+- **Build Tool:** Vite
+- **Linting:** ESLint
+
+Backend is managed via Convex at https://rare-elephant-985.convex.cloud. Database schema and functions are located in `/convex`.
 
 ## Backend
 
@@ -43,16 +49,17 @@ VITE_CONVEX_URL=https://rare-elephant-985.convex.cloud
 
 ### Running the App
 
-Start the frontend dev server:
+Start both frontend and backend together:
 
 ```bash
-npm run dev
+npm run dev:all
 ```
 
-Start the Convex backend dev server (in a separate terminal):
+Or run them separately:
 
 ```bash
-npm run dev:backend
+npm run dev:frontend   # Frontend only
+npm run dev:backend    # Convex backend only
 ```
 
 ### Building for Production
