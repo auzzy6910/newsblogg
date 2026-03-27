@@ -1,7 +1,16 @@
 import { useState } from 'react'
+import { Routes, Route, Link } from 'react-router-dom'
 import { useQuery, useMutation } from 'convex/react'
 import { api } from '../convex/_generated/api'
 import './App.css'
+import CategoryPage from './pages/CategoryPage'
+import ShowPage from './pages/ShowPage'
+import AboutPage from './pages/AboutPage'
+import ContactPage from './pages/ContactPage'
+import CareersPage from './pages/CareersPage'
+import AdvertisePage from './pages/AdvertisePage'
+import PressPage from './pages/PressPage'
+import LegalPage from './pages/LegalPage'
 import {
   Search,
   Menu,
@@ -38,6 +47,51 @@ import {
 const navCategories = [
   "Home", "U.S.", "World", "Politics", "Business", "Tech", "Science",
   "Health", "Sports", "Entertainment", "Opinion", "Video"
+]
+
+const navCategoryToSlug: Record<string, string> = {
+  'Home': '/',
+  'U.S.': '/category/us-news',
+  'World': '/category/world',
+  'Politics': '/category/politics',
+  'Business': '/category/business',
+  'Tech': '/category/technology',
+  'Science': '/category/science',
+  'Health': '/category/health',
+  'Sports': '/category/sports',
+  'Entertainment': '/category/entertainment',
+  'Opinion': '/#opinion',
+  'Video': '/#video',
+}
+
+const footerNewsLinks: { label: string; to: string }[] = [
+  { label: 'U.S. News', to: '/category/us-news' },
+  { label: 'World', to: '/category/world' },
+  { label: 'Politics', to: '/category/politics' },
+  { label: 'Business', to: '/category/business' },
+  { label: 'Technology', to: '/category/technology' },
+  { label: 'Science', to: '/category/science' },
+  { label: 'Health', to: '/category/health' },
+]
+
+const footerShowLinks: { label: string; to: string }[] = [
+  { label: 'Morning Report', to: '/shows/morning-report' },
+  { label: 'Midday Briefing', to: '/shows/midday-briefing' },
+  { label: 'Evening Roundup', to: '/shows/evening-roundup' },
+  { label: 'Weekend Review', to: '/shows/weekend-review' },
+  { label: 'Special Investigations', to: '/shows/special-investigations' },
+  { label: 'Frolick Debates', to: '/shows/frolick-debates' },
+]
+
+const footerCompanyLinks: { label: string; to: string }[] = [
+  { label: 'About Us', to: '/about' },
+  { label: 'Careers', to: '/careers' },
+  { label: 'Advertise With Us', to: '/advertise' },
+  { label: 'Contact', to: '/contact' },
+  { label: 'Press', to: '/press' },
+  { label: 'Terms of Use', to: '/legal/terms-of-use' },
+  { label: 'Privacy Policy', to: '/legal/privacy-policy' },
+  { label: 'Accessibility', to: '/legal/accessibility' },
 ]
 
 interface Article {
@@ -116,8 +170,8 @@ function TopBar() {
           <span className="hidden sm:inline text-frolick-yellow font-medium">LIVE UPDATES</span>
         </div>
         <div className="flex items-center gap-4">
-          <a href="#" className="hover:text-frolick-yellow transition-colors">Subscribe</a>
-          <a href="#" className="hover:text-frolick-yellow transition-colors">Newsletter</a>
+          <a href="#newsletter" className="hover:text-frolick-yellow transition-colors">Subscribe</a>
+          <a href="#newsletter" className="hover:text-frolick-yellow transition-colors">Newsletter</a>
           <a href="#" className="hover:text-frolick-yellow transition-colors">Login</a>
         </div>
       </div>
@@ -139,7 +193,7 @@ function Header({ mobileMenuOpen, setMobileMenuOpen }: { mobileMenuOpen: boolean
             {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
           </button>
 
-          <div className="flex items-center gap-2">
+          <Link to="/" className="flex items-center gap-2">
             <div className="bg-frolick-yellow text-frolick-dark font-oswald font-bold text-3xl px-3 py-1 tracking-tight">
               F
             </div>
@@ -151,7 +205,7 @@ function Header({ mobileMenuOpen, setMobileMenuOpen }: { mobileMenuOpen: boolean
                 FAIR · FEARLESS · FIRST
               </p>
             </div>
-          </div>
+          </Link>
 
           <div className="flex items-center gap-3">
             {searchOpen ? (
@@ -187,9 +241,9 @@ function Header({ mobileMenuOpen, setMobileMenuOpen }: { mobileMenuOpen: boolean
         <div className="max-w-7xl mx-auto px-4">
           <div className="hidden lg:flex items-center gap-0">
             {navCategories.map((cat, i) => (
-              <a
+              <Link
                 key={cat}
-                href="#"
+                to={navCategoryToSlug[cat] || '/'}
                 className={`px-4 py-2.5 text-sm font-oswald font-medium tracking-wide transition-colors ${
                   i === 0
                     ? 'text-frolick-yellow border-b-2 border-frolick-yellow'
@@ -197,7 +251,7 @@ function Header({ mobileMenuOpen, setMobileMenuOpen }: { mobileMenuOpen: boolean
                 }`}
               >
                 {cat}
-              </a>
+              </Link>
             ))}
           </div>
         </div>
@@ -207,13 +261,14 @@ function Header({ mobileMenuOpen, setMobileMenuOpen }: { mobileMenuOpen: boolean
       {mobileMenuOpen && (
         <div className="lg:hidden bg-frolick-dark border-t border-frolick-charcoal">
           {navCategories.map((cat) => (
-            <a
+            <Link
               key={cat}
-              href="#"
+              to={navCategoryToSlug[cat] || '/'}
+              onClick={() => setMobileMenuOpen(false)}
               className="block px-6 py-3 text-white font-oswald text-lg hover:bg-frolick-charcoal hover:text-frolick-yellow transition-colors border-b border-frolick-charcoal/50"
             >
               {cat}
-            </a>
+            </Link>
           ))}
           <div className="p-4">
             <button className="w-full flex items-center justify-center gap-2 bg-frolick-yellow text-frolick-dark font-oswald font-semibold px-4 py-3 rounded hover:bg-frolick-amber transition-colors">
@@ -656,24 +711,24 @@ function Footer() {
       <div className="max-w-7xl mx-auto px-4 py-12">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           <div>
-            <div className="flex items-center gap-2 mb-4">
+            <Link to="/" className="flex items-center gap-2 mb-4">
               <div className="bg-frolick-yellow text-frolick-dark font-oswald font-bold text-2xl px-2 py-0.5">F</div>
               <span className="font-oswald font-bold text-xl text-white">FROLICK</span>
-            </div>
+            </Link>
             <p className="font-roboto text-sm leading-relaxed">
               Your trusted source for breaking news, in-depth analysis, and expert commentary on the stories that matter most.
             </p>
             <div className="flex items-center gap-3 mt-4">
-              <a href="#" className="w-9 h-9 bg-frolick-charcoal hover:bg-frolick-yellow hover:text-frolick-dark rounded-full flex items-center justify-center transition-all">
+              <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" className="w-9 h-9 bg-frolick-charcoal hover:bg-frolick-yellow hover:text-frolick-dark rounded-full flex items-center justify-center transition-all">
                 <Facebook className="w-4 h-4" />
               </a>
-              <a href="#" className="w-9 h-9 bg-frolick-charcoal hover:bg-frolick-yellow hover:text-frolick-dark rounded-full flex items-center justify-center transition-all">
+              <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" className="w-9 h-9 bg-frolick-charcoal hover:bg-frolick-yellow hover:text-frolick-dark rounded-full flex items-center justify-center transition-all">
                 <Twitter className="w-4 h-4" />
               </a>
-              <a href="#" className="w-9 h-9 bg-frolick-charcoal hover:bg-frolick-yellow hover:text-frolick-dark rounded-full flex items-center justify-center transition-all">
+              <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" className="w-9 h-9 bg-frolick-charcoal hover:bg-frolick-yellow hover:text-frolick-dark rounded-full flex items-center justify-center transition-all">
                 <Instagram className="w-4 h-4" />
               </a>
-              <a href="#" className="w-9 h-9 bg-frolick-charcoal hover:bg-frolick-yellow hover:text-frolick-dark rounded-full flex items-center justify-center transition-all">
+              <a href="https://youtube.com" target="_blank" rel="noopener noreferrer" className="w-9 h-9 bg-frolick-charcoal hover:bg-frolick-yellow hover:text-frolick-dark rounded-full flex items-center justify-center transition-all">
                 <Youtube className="w-4 h-4" />
               </a>
             </div>
@@ -682,8 +737,8 @@ function Footer() {
           <div>
             <h4 className="font-oswald font-bold text-white text-sm tracking-wider mb-4">NEWS</h4>
             <ul className="space-y-2 text-sm font-roboto">
-              {["U.S. News", "World", "Politics", "Business", "Technology", "Science", "Health"].map(link => (
-                <li key={link}><a href="#" className="hover:text-frolick-yellow transition-colors">{link}</a></li>
+              {footerNewsLinks.map(link => (
+                <li key={link.label}><Link to={link.to} className="hover:text-frolick-yellow transition-colors">{link.label}</Link></li>
               ))}
             </ul>
           </div>
@@ -691,8 +746,8 @@ function Footer() {
           <div>
             <h4 className="font-oswald font-bold text-white text-sm tracking-wider mb-4">SHOWS</h4>
             <ul className="space-y-2 text-sm font-roboto">
-              {["Morning Report", "Midday Briefing", "Evening Roundup", "Weekend Review", "Special Investigations", "Frolick Debates"].map(link => (
-                <li key={link}><a href="#" className="hover:text-frolick-yellow transition-colors">{link}</a></li>
+              {footerShowLinks.map(link => (
+                <li key={link.label}><Link to={link.to} className="hover:text-frolick-yellow transition-colors">{link.label}</Link></li>
               ))}
             </ul>
           </div>
@@ -700,8 +755,8 @@ function Footer() {
           <div>
             <h4 className="font-oswald font-bold text-white text-sm tracking-wider mb-4">COMPANY</h4>
             <ul className="space-y-2 text-sm font-roboto">
-              {["About Us", "Careers", "Advertise With Us", "Contact", "Press", "Terms of Use", "Privacy Policy", "Accessibility"].map(link => (
-                <li key={link}><a href="#" className="hover:text-frolick-yellow transition-colors">{link}</a></li>
+              {footerCompanyLinks.map(link => (
+                <li key={link.label}><Link to={link.to} className="hover:text-frolick-yellow transition-colors">{link.label}</Link></li>
               ))}
             </ul>
           </div>
@@ -774,20 +829,9 @@ function MoreStoriesSection() {
   )
 }
 
-function App() {
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
-
+function HomePage() {
   return (
-    <div className="min-h-screen bg-gray-50 font-roboto">
-      {/* Top Bar */}
-      <TopBar />
-
-      {/* Breaking News Ticker */}
-      <BreakingTicker />
-
-      {/* Header & Nav */}
-      <Header mobileMenuOpen={mobileMenuOpen} setMobileMenuOpen={setMobileMenuOpen} />
-
+    <>
       {/* Hero Section */}
       <HeroSection />
 
@@ -818,13 +862,49 @@ function App() {
       <MoreStoriesSection />
 
       {/* Opinion Section */}
-      <OpinionSection />
+      <div id="opinion">
+        <OpinionSection />
+      </div>
 
       {/* Video Section */}
-      <VideoSection />
+      <div id="video">
+        <VideoSection />
+      </div>
 
       {/* Newsletter */}
-      <NewsletterSection />
+      <div id="newsletter">
+        <NewsletterSection />
+      </div>
+    </>
+  )
+}
+
+function App() {
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+
+  return (
+    <div className="min-h-screen bg-gray-50 font-roboto">
+      {/* Top Bar */}
+      <TopBar />
+
+      {/* Breaking News Ticker */}
+      <BreakingTicker />
+
+      {/* Header & Nav */}
+      <Header mobileMenuOpen={mobileMenuOpen} setMobileMenuOpen={setMobileMenuOpen} />
+
+      {/* Routes */}
+      <Routes>
+        <Route path="/" element={<HomePage />} />
+        <Route path="/category/:slug" element={<CategoryPage />} />
+        <Route path="/shows/:slug" element={<ShowPage />} />
+        <Route path="/about" element={<AboutPage />} />
+        <Route path="/contact" element={<ContactPage />} />
+        <Route path="/careers" element={<CareersPage />} />
+        <Route path="/advertise" element={<AdvertisePage />} />
+        <Route path="/press" element={<PressPage />} />
+        <Route path="/legal/:slug" element={<LegalPage />} />
+      </Routes>
 
       {/* Footer */}
       <Footer />
