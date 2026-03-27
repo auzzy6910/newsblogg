@@ -1,50 +1,75 @@
-# React + TypeScript + Vite
+# Frolick News
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A full-stack news blog application built with React, TypeScript, Vite, and Convex.
 
-Currently, two official plugins are available:
+## Technical Stack
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- **Frontend:** React 18 + TypeScript + Vite (located in `src/`)
+- **Backend:** Convex (located in `convex/`)
+- **Styling:** Tailwind CSS + tailwindcss-animate
+- **UI Components:** Lucide React icons, Recharts, class-variance-authority
+- **Build Tool:** Vite
+- **Linting:** ESLint
 
-## Expanding the ESLint configuration
+Backend is managed via Convex at https://rare-elephant-985.convex.cloud. Database schema and functions are located in `/convex`.
 
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
+## Backend
 
-- Configure the top-level `parserOptions` property like this:
+The backend is powered by [Convex](https://convex.dev) and is hosted at:
 
-```js
-export default tseslint.config({
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+- **Convex Backend URL:** https://rare-elephant-985.convex.cloud
+- **Convex Dashboard:** https://dashboard.convex.dev/d/rare-elephant-985
+
+## Getting Started
+
+### Prerequisites
+
+- Node.js (v18+)
+- npm
+
+### Installation
+
+```bash
+npm install
 ```
 
-- Replace `tseslint.configs.recommended` to `tseslint.configs.recommendedTypeChecked` or `tseslint.configs.strictTypeChecked`
-- Optionally add `...tseslint.configs.stylisticTypeChecked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and update the config:
+### Environment Setup
 
-```js
-// eslint.config.js
-import react from 'eslint-plugin-react'
+Copy the example environment file and update values as needed:
 
-export default tseslint.config({
-  // Set the react version
-  settings: { react: { version: '18.3' } },
-  plugins: {
-    // Add the react plugin
-    react,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended rules
-    ...react.configs.recommended.rules,
-    ...react.configs['jsx-runtime'].rules,
-  },
-})
+```bash
+cp .env.example .env.local
+```
+
+The `.env.local` file should contain:
+
+```
+VITE_CONVEX_URL=https://rare-elephant-985.convex.cloud
+```
+
+### Running the App
+
+Start both frontend and backend together:
+
+```bash
+npm run dev:all
+```
+
+Or run them separately:
+
+```bash
+npm run dev:frontend   # Frontend only
+npm run dev:backend    # Convex backend only
+```
+
+### Building for Production
+
+```bash
+npm run build
+```
+
+### Linting
+
+```bash
+npm run lint
 ```
