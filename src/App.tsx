@@ -1,4 +1,6 @@
 import { useState } from 'react'
+import { useQuery, useMutation } from 'convex/react'
+import { api } from '../convex/_generated/api'
 import './App.css'
 import {
   Search,
@@ -28,16 +30,10 @@ import {
   Eye,
   ThumbsUp,
   AlertTriangle,
+  Loader2,
 } from 'lucide-react'
 
-// ─── DATA ──────────────────────────────────────────────────────────────────────
-
-const breakingNews = [
-  "BREAKING: Markets surge as Federal Reserve signals rate cut in upcoming quarter",
-  "ALERT: Major diplomatic summit convenes in Geneva amid rising global tensions",
-  "UPDATE: New climate legislation passes Senate with bipartisan support",
-  "BREAKING: Tech giants announce landmark AI safety agreement",
-]
+// ─── CONSTANTS ──────────────────────────────────────────────────────────────────
 
 const navCategories = [
   "Home", "U.S.", "World", "Politics", "Business", "Tech", "Science",
@@ -45,7 +41,7 @@ const navCategories = [
 ]
 
 interface Article {
-  id: number
+  _id: string
   title: string
   excerpt: string
   category: string
@@ -57,162 +53,8 @@ interface Article {
   isBreaking?: boolean
   isExclusive?: boolean
   comments: number
+  type: "hero" | "featured" | "latest"
 }
-
-const heroArticle: Article = {
-  id: 1,
-  title: "Global Leaders Convene for Historic Climate Summit as Extreme Weather Events Intensify Worldwide",
-  excerpt: "World leaders from over 190 nations gather in an unprecedented summit to address the escalating climate crisis, with ambitious new commitments expected to reshape international environmental policy for the coming decade.",
-  category: "WORLD",
-  image: "/images/hero-news.jpg",
-  author: "Alexandra Reynolds",
-  time: "2 hours ago",
-  readTime: "8 min read",
-  isBreaking: true,
-  comments: 1247,
-}
-
-const featuredArticles: Article[] = [
-  {
-    id: 2,
-    title: "Senate Passes Sweeping Infrastructure Bill in Late-Night Vote",
-    excerpt: "The landmark legislation allocates $1.2 trillion for roads, bridges, broadband, and clean energy projects across all 50 states.",
-    category: "POLITICS",
-    image: "/images/politics.jpg",
-    author: "Michael Torres",
-    time: "3 hours ago",
-    readTime: "6 min read",
-    isLive: true,
-    comments: 834,
-  },
-  {
-    id: 3,
-    title: "Wall Street Rallies as Tech Earnings Exceed Analyst Expectations",
-    excerpt: "Major indices climb to record highs following stellar quarterly reports from leading technology companies.",
-    category: "BUSINESS",
-    image: "/images/business.jpg",
-    author: "Sarah Kim",
-    time: "4 hours ago",
-    readTime: "5 min read",
-    comments: 562,
-  },
-  {
-    id: 4,
-    title: "Revolutionary AI Model Achieves Breakthrough in Medical Diagnosis",
-    excerpt: "Researchers unveil an artificial intelligence system capable of detecting diseases with unprecedented accuracy, promising to transform healthcare delivery.",
-    category: "TECHNOLOGY",
-    image: "/images/technology.jpg",
-    author: "Dr. James Chen",
-    time: "5 hours ago",
-    readTime: "7 min read",
-    isExclusive: true,
-    comments: 923,
-  },
-]
-
-const latestArticles: Article[] = [
-  {
-    id: 5,
-    title: "Diplomatic Tensions Rise in Eastern Mediterranean Over Maritime Boundaries",
-    excerpt: "Naval standoff escalates between regional powers as negotiations stall over contested waters rich in natural gas reserves.",
-    category: "WORLD",
-    image: "/images/world.jpg",
-    author: "Nadia Petrova",
-    time: "1 hour ago",
-    readTime: "6 min read",
-    comments: 445,
-  },
-  {
-    id: 6,
-    title: "Championship Finals: Underdogs Stun Favorites in Historic Upset Victory",
-    excerpt: "In a thrilling seven-game series, the underdog franchise clinches their first title in franchise history.",
-    category: "SPORTS",
-    image: "/images/sports.jpg",
-    author: "Marcus Johnson",
-    time: "30 min ago",
-    readTime: "4 min read",
-    isLive: true,
-    comments: 2103,
-  },
-  {
-    id: 7,
-    title: "Award Season Heats Up: Surprise Nominees Shake Up Oscar Predictions",
-    excerpt: "Independent films dominate nominations as Hollywood's biggest night promises an unpredictable outcome.",
-    category: "ENTERTAINMENT",
-    image: "/images/entertainment.jpg",
-    author: "Rachel Adams",
-    time: "2 hours ago",
-    readTime: "5 min read",
-    comments: 678,
-  },
-  {
-    id: 8,
-    title: "Groundbreaking Study Links Gut Microbiome to Mental Health Outcomes",
-    excerpt: "New research reveals surprising connections between digestive health and psychological wellbeing, opening doors for novel treatments.",
-    category: "HEALTH",
-    image: "/images/health.jpg",
-    author: "Dr. Emily Watts",
-    time: "3 hours ago",
-    readTime: "9 min read",
-    comments: 312,
-  },
-  {
-    id: 9,
-    title: "NASA's Deep Space Telescope Captures New Images of Distant Galaxy Formation",
-    excerpt: "Stunning photographs from the edge of the observable universe reveal the earliest stages of galactic evolution.",
-    category: "SCIENCE",
-    image: "/images/science.jpg",
-    author: "Prof. David Park",
-    time: "4 hours ago",
-    readTime: "7 min read",
-    isExclusive: true,
-    comments: 891,
-  },
-]
-
-const trendingTopics = [
-  { name: "Climate Summit 2026", count: "45.2K" },
-  { name: "Infrastructure Bill", count: "32.8K" },
-  { name: "AI Healthcare", count: "28.1K" },
-  { name: "Championship Finals", count: "67.4K" },
-  { name: "Oscar Nominations", count: "21.5K" },
-  { name: "Federal Reserve", count: "19.3K" },
-  { name: "Space Discovery", count: "15.7K" },
-  { name: "Cybersecurity Act", count: "12.9K" },
-]
-
-const opinionArticles = [
-  {
-    id: 101,
-    title: "Why the Climate Summit Must Deliver More Than Promises This Time",
-    author: "Dr. Patricia Moore",
-    authorImage: "/images/opinion-author.jpg",
-    time: "Today",
-  },
-  {
-    id: 102,
-    title: "The Infrastructure Bill Is a Good Start, But We Need Bolder Vision",
-    author: "Robert Steinberg",
-    authorImage: "/images/opinion-author.jpg",
-    time: "Today",
-  },
-  {
-    id: 103,
-    title: "AI in Medicine: Promise and Peril of Automated Diagnosis",
-    author: "Dr. Lisa Yamamoto",
-    authorImage: "/images/opinion-author.jpg",
-    time: "Yesterday",
-  },
-]
-
-const liveUpdates = [
-  { time: "12:45 PM", text: "Senate committee begins hearing on tech regulation bill", isNew: true },
-  { time: "12:30 PM", text: "Markets update: Dow Jones up 1.2% at midday trading", isNew: true },
-  { time: "12:15 PM", text: "Weather alert: Severe storms expected across the Southeast", isNew: false },
-  { time: "12:00 PM", text: "Press briefing scheduled for 2:00 PM ET on border policy", isNew: false },
-  { time: "11:45 AM", text: "Trade negotiations resume between major economic powers", isNew: false },
-  { time: "11:30 AM", text: "New jobs report shows unemployment at historic low", isNew: false },
-]
 
 const categoryIcons: Record<string, React.ReactNode> = {
   WORLD: <Globe className="w-4 h-4" />,
@@ -227,7 +69,19 @@ const categoryIcons: Record<string, React.ReactNode> = {
 
 // ─── COMPONENTS ────────────────────────────────────────────────────────────────
 
+function LoadingSpinner() {
+  return (
+    <div className="flex items-center justify-center py-12">
+      <Loader2 className="w-8 h-8 text-frolick-yellow animate-spin" />
+    </div>
+  )
+}
+
 function BreakingTicker() {
+  const breakingNewsData = useQuery(api.breakingNews.getAll)
+
+  if (!breakingNewsData || breakingNewsData.length === 0) return null
+
   return (
     <div className="bg-frolick-red text-white overflow-hidden">
       <div className="flex items-center">
@@ -237,10 +91,10 @@ function BreakingTicker() {
         </div>
         <div className="overflow-hidden whitespace-nowrap py-2">
           <div className="inline-block animate-marquee">
-            {breakingNews.map((news, i) => (
-              <span key={i} className="mx-8 text-sm font-roboto">
-                {news}
-                {i < breakingNews.length - 1 && <span className="mx-8 text-frolick-yellow">●</span>}
+            {breakingNewsData.map((news, i) => (
+              <span key={news._id} className="mx-8 text-sm font-roboto">
+                {news.text}
+                {i < breakingNewsData.length - 1 && <span className="mx-8 text-frolick-yellow">●</span>}
               </span>
             ))}
           </div>
@@ -403,7 +257,7 @@ function CategoryBadge({ category, isLive, isBreaking, isExclusive }: {
   )
 }
 
-function ArticleCard({ article, variant = 'default' }: { article: Article, variant?: 'default' | 'horizontal' | 'compact' }) {
+function ArticleCard({ article, compactId, variant = 'default' }: { article: Article, compactId?: number, variant?: 'default' | 'horizontal' | 'compact' }) {
   const imgFallback = `https://placehold.co/800x500/1A1A1A/FFD700/png?text=${article.category}`
 
   if (variant === 'horizontal') {
@@ -443,9 +297,9 @@ function ArticleCard({ article, variant = 'default' }: { article: Article, varia
   if (variant === 'compact') {
     return (
       <article className="group flex items-start gap-3 py-3 border-b border-gray-100 last:border-0">
-        <div className="bg-frolick-yellow text-frolick-dark font-oswald font-bold text-lg w-8 h-8 flex items-center justify-center rounded shrink-0">
-          {article.id}
-        </div>
+          <div className="bg-frolick-yellow text-frolick-dark font-oswald font-bold text-lg w-8 h-8 flex items-center justify-center rounded shrink-0">
+            {compactId ?? 1}
+          </div>
         <div>
           <span className="text-xs font-oswald text-frolick-yellow-dark font-semibold">{article.category}</span>
           <h4 className="font-roboto font-medium text-sm text-frolick-dark leading-snug group-hover:text-frolick-yellow-dark transition-colors cursor-pointer">
@@ -494,7 +348,13 @@ function ArticleCard({ article, variant = 'default' }: { article: Article, varia
 }
 
 function HeroSection() {
+  const heroArticle = useQuery(api.articles.getHero)
+  const featuredArticles = useQuery(api.articles.getFeatured)
   const imgFallback = "https://placehold.co/1200x600/1A1A1A/FFD700/png?text=BREAKING+NEWS"
+
+  if (heroArticle === undefined || featuredArticles === undefined) return <LoadingSpinner />
+  if (!heroArticle) return null
+
   return (
     <section className="relative">
       <div className="max-w-7xl mx-auto px-4 py-6">
@@ -531,8 +391,8 @@ function HeroSection() {
 
           {/* Side stories */}
           <div className="flex flex-col gap-4">
-            {featuredArticles.slice(0, 3).map((article) => (
-              <article key={article.id} className="group relative rounded-lg overflow-hidden shadow-lg cursor-pointer flex-1">
+            {(featuredArticles ?? []).slice(0, 3).map((article) => (
+              <article key={article._id} className="group relative rounded-lg overflow-hidden shadow-lg cursor-pointer flex-1">
                 <img
                   src={article.image}
                   alt={article.title}
@@ -557,6 +417,10 @@ function HeroSection() {
 }
 
 function LiveUpdatesSidebar() {
+  const liveUpdatesData = useQuery(api.liveUpdates.getAll)
+
+  if (liveUpdatesData === undefined) return <LoadingSpinner />
+
   return (
     <div className="bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden">
       <div className="bg-frolick-dark px-4 py-3 flex items-center justify-between">
@@ -567,8 +431,8 @@ function LiveUpdatesSidebar() {
         <span className="w-2.5 h-2.5 bg-frolick-red rounded-full animate-pulse" />
       </div>
       <div className="divide-y divide-gray-100">
-        {liveUpdates.map((update, i) => (
-          <div key={i} className="px-4 py-3 hover:bg-frolick-yellow-light/30 transition-colors cursor-pointer">
+        {liveUpdatesData.map((update) => (
+          <div key={update._id} className="px-4 py-3 hover:bg-frolick-yellow-light/30 transition-colors cursor-pointer">
             <div className="flex items-start gap-3">
               <span className="text-xs font-roboto text-gray-400 shrink-0 mt-0.5">{update.time}</span>
               <p className="text-sm font-roboto text-frolick-dark leading-snug">
@@ -589,6 +453,10 @@ function LiveUpdatesSidebar() {
 }
 
 function TrendingSidebar() {
+  const trendingTopicsData = useQuery(api.trendingTopics.getAll)
+
+  if (trendingTopicsData === undefined) return <LoadingSpinner />
+
   return (
     <div className="bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden">
       <div className="bg-frolick-yellow px-4 py-3">
@@ -598,8 +466,8 @@ function TrendingSidebar() {
         </h3>
       </div>
       <div className="divide-y divide-gray-100">
-        {trendingTopics.map((topic, i) => (
-          <a key={i} href="#" className="flex items-center gap-3 px-4 py-3 hover:bg-frolick-yellow-light/30 transition-colors group">
+        {trendingTopicsData.map((topic, i) => (
+          <a key={topic._id} href="#" className="flex items-center gap-3 px-4 py-3 hover:bg-frolick-yellow-light/30 transition-colors group">
             <span className="font-oswald font-bold text-lg text-frolick-yellow-dark w-6">{i + 1}</span>
             <div className="flex-1">
               <span className="font-roboto font-medium text-sm text-frolick-dark group-hover:text-frolick-yellow-dark transition-colors">
@@ -616,6 +484,10 @@ function TrendingSidebar() {
 }
 
 function OpinionSection() {
+  const opinionArticlesData = useQuery(api.opinionArticles.getAll)
+
+  if (opinionArticlesData === undefined) return <LoadingSpinner />
+
   return (
     <section className="bg-frolick-dark py-10">
       <div className="max-w-7xl mx-auto px-4">
@@ -624,8 +496,8 @@ function OpinionSection() {
           <h2 className="font-oswald font-bold text-2xl text-white">OPINION & ANALYSIS</h2>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {opinionArticles.map((article) => (
-            <article key={article.id} className="bg-frolick-charcoal rounded-lg p-5 hover:bg-frolick-gray transition-colors cursor-pointer group">
+          {opinionArticlesData.map((article) => (
+            <article key={article._id} className="bg-frolick-charcoal rounded-lg p-5 hover:bg-frolick-gray transition-colors cursor-pointer group">
               <div className="flex items-center gap-3 mb-4">
                 <img
                   src={article.authorImage}
@@ -653,6 +525,10 @@ function OpinionSection() {
 }
 
 function VideoSection() {
+  const videosData = useQuery(api.videos.getAll)
+
+  if (videosData === undefined) return <LoadingSpinner />
+
   return (
     <section className="bg-frolick-darker py-10">
       <div className="max-w-7xl mx-auto px-4">
@@ -669,16 +545,11 @@ function VideoSection() {
           </a>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          {[
-            { title: "Inside the Climate Summit: Exclusive Behind-the-Scenes Coverage", duration: "12:34", views: "1.2M" },
-            { title: "Tech CEOs Testify on AI Safety Before Congressional Committee", duration: "8:45", views: "890K" },
-            { title: "Championship Highlights: Top 10 Plays of the Finals", duration: "5:22", views: "3.4M" },
-            { title: "Economic Outlook: Expert Panel Discusses Market Trends", duration: "15:08", views: "456K" },
-          ].map((video, i) => (
-            <div key={i} className="group cursor-pointer">
+          {videosData.map((video) => (
+            <div key={video._id} className="group cursor-pointer">
               <div className="relative rounded-lg overflow-hidden bg-frolick-charcoal aspect-video">
                 <img
-                  src={latestArticles[i]?.image || '/images/hero-news.jpg'}
+                  src={video.thumbnailImage}
                   alt={video.title}
                   className="w-full h-full object-cover opacity-80 group-hover:opacity-100 group-hover:scale-105 transition-all duration-500"
                   onError={(e) => { (e.target as HTMLImageElement).src = 'https://placehold.co/400x225/1A1A1A/FFD700/png?text=VIDEO' }}
@@ -707,6 +578,17 @@ function VideoSection() {
 }
 
 function NewsletterSection() {
+  const [email, setEmail] = useState('')
+  const [status, setStatus] = useState<{ success: boolean; message: string } | null>(null)
+  const subscribe = useMutation(api.newsletter.subscribe)
+
+  const handleSubscribe = async () => {
+    if (!email.trim()) return
+    const result = await subscribe({ email: email.trim() })
+    setStatus(result)
+    if (result.success) setEmail('')
+  }
+
   return (
     <section className="bg-frolick-yellow py-10">
       <div className="max-w-7xl mx-auto px-4">
@@ -720,12 +602,22 @@ function NewsletterSection() {
             <input
               type="email"
               placeholder="Enter your email"
+              value={email}
+              onChange={(e) => { setEmail(e.target.value); setStatus(null) }}
               className="flex-1 px-4 py-3 rounded-lg font-roboto text-sm border-2 border-frolick-dark/20 focus:border-frolick-dark outline-none"
             />
-            <button className="bg-frolick-dark text-frolick-yellow font-oswald font-bold px-6 py-3 rounded-lg hover:bg-frolick-darker transition-colors tracking-wide">
+            <button
+              onClick={handleSubscribe}
+              className="bg-frolick-dark text-frolick-yellow font-oswald font-bold px-6 py-3 rounded-lg hover:bg-frolick-darker transition-colors tracking-wide"
+            >
               SUBSCRIBE
             </button>
           </div>
+          {status && (
+            <p className={`text-sm mt-3 font-roboto font-medium ${status.success ? 'text-green-700' : 'text-red-700'}`}>
+              {status.message}
+            </p>
+          )}
           <p className="text-xs text-frolick-gray mt-3 font-roboto">
             By subscribing, you agree to our Terms of Service and Privacy Policy.
           </p>
@@ -736,7 +628,11 @@ function NewsletterSection() {
 }
 
 function MostReadSidebar() {
-  const mostRead = latestArticles.slice(0, 5).map((a, i) => ({ ...a, id: i + 1 }))
+  const latestArticles = useQuery(api.articles.getLatest)
+
+  if (latestArticles === undefined) return <LoadingSpinner />
+
+  const mostRead = (latestArticles ?? []).slice(0, 5)
   return (
     <div className="bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden">
       <div className="bg-frolick-dark px-4 py-3">
@@ -746,8 +642,8 @@ function MostReadSidebar() {
         </h3>
       </div>
       <div className="p-3">
-        {mostRead.map((article) => (
-          <ArticleCard key={article.id} article={article} variant="compact" />
+        {mostRead.map((article, i) => (
+          <ArticleCard key={article._id} article={article} compactId={i + 1} variant="compact" />
         ))}
       </div>
     </div>
@@ -824,6 +720,60 @@ function Footer() {
 
 // ─── MAIN APP ──────────────────────────────────────────────────────────────────
 
+function LatestNewsSection() {
+  const latestArticles = useQuery(api.articles.getLatest)
+
+  if (latestArticles === undefined) return <LoadingSpinner />
+
+  return (
+    <div className="lg:col-span-2">
+      <div className="flex items-center gap-3 mb-6">
+        <div className="w-1.5 h-8 bg-frolick-yellow rounded-full" />
+        <h2 className="font-oswald font-bold text-2xl text-frolick-dark">LATEST NEWS</h2>
+        <div className="flex-1 h-px bg-gray-200" />
+      </div>
+
+      <div className="space-y-4">
+        {(latestArticles ?? []).map((article) => (
+          <ArticleCard key={article._id} article={article} variant="horizontal" />
+        ))}
+      </div>
+
+      <div className="text-center mt-8">
+        <button className="bg-frolick-dark text-frolick-yellow font-oswald font-bold px-8 py-3 rounded hover:bg-frolick-charcoal transition-colors tracking-wide">
+          LOAD MORE STORIES
+        </button>
+      </div>
+    </div>
+  )
+}
+
+function MoreStoriesSection() {
+  const featuredArticles = useQuery(api.articles.getFeatured)
+  const latestArticles = useQuery(api.articles.getLatest)
+
+  if (featuredArticles === undefined || latestArticles === undefined) return <LoadingSpinner />
+
+  const moreStories = [...(featuredArticles ?? []), ...(latestArticles ?? []).slice(0, 3)]
+
+  return (
+    <section className="bg-white py-10 border-t border-gray-100">
+      <div className="max-w-7xl mx-auto px-4">
+        <div className="flex items-center gap-3 mb-6">
+          <div className="w-1.5 h-8 bg-frolick-yellow rounded-full" />
+          <h2 className="font-oswald font-bold text-2xl text-frolick-dark">MORE STORIES</h2>
+          <div className="flex-1 h-px bg-gray-200" />
+        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          {moreStories.map((article) => (
+            <ArticleCard key={article._id} article={article} />
+          ))}
+        </div>
+      </div>
+    </section>
+  )
+}
+
 function App() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
@@ -845,25 +795,7 @@ function App() {
       <section className="max-w-7xl mx-auto px-4 py-8">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Main Content */}
-          <div className="lg:col-span-2">
-            <div className="flex items-center gap-3 mb-6">
-              <div className="w-1.5 h-8 bg-frolick-yellow rounded-full" />
-              <h2 className="font-oswald font-bold text-2xl text-frolick-dark">LATEST NEWS</h2>
-              <div className="flex-1 h-px bg-gray-200" />
-            </div>
-
-            <div className="space-y-4">
-              {latestArticles.map((article) => (
-                <ArticleCard key={article.id} article={article} variant="horizontal" />
-              ))}
-            </div>
-
-            <div className="text-center mt-8">
-              <button className="bg-frolick-dark text-frolick-yellow font-oswald font-bold px-8 py-3 rounded hover:bg-frolick-charcoal transition-colors tracking-wide">
-                LOAD MORE STORIES
-              </button>
-            </div>
-          </div>
+          <LatestNewsSection />
 
           {/* Sidebar */}
           <aside className="space-y-6">
@@ -883,20 +815,7 @@ function App() {
       </section>
 
       {/* Category Grid */}
-      <section className="bg-white py-10 border-t border-gray-100">
-        <div className="max-w-7xl mx-auto px-4">
-          <div className="flex items-center gap-3 mb-6">
-            <div className="w-1.5 h-8 bg-frolick-yellow rounded-full" />
-            <h2 className="font-oswald font-bold text-2xl text-frolick-dark">MORE STORIES</h2>
-            <div className="flex-1 h-px bg-gray-200" />
-          </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {[...featuredArticles, ...latestArticles.slice(0, 3)].map((article) => (
-              <ArticleCard key={article.id} article={article} />
-            ))}
-          </div>
-        </div>
-      </section>
+      <MoreStoriesSection />
 
       {/* Opinion Section */}
       <OpinionSection />
