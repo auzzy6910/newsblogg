@@ -1,9 +1,10 @@
+import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import {
   Clock, Share2, MessageSquare, Bookmark, Flame,
   Globe, AlertTriangle, DollarSign, Zap, Trophy,
   Tv, Heart, FlaskConical, TrendingUp, ThumbsUp,
-  ChevronRight, Eye, Play, ArrowRight,
+  ChevronRight, Eye, Play, ArrowRight, X,
 } from 'lucide-react'
 import type { Article, LiveUpdate, TrendingTopic, OpinionArticle, VideoItem } from '../data/newsData'
 import { liveUpdates, trendingTopics, latestArticles } from '../data/newsData'
@@ -335,8 +336,35 @@ export function OpinionSection({ articles }: { articles?: OpinionArticle[] }) {
 
 export function VideoSection({ videos }: { videos?: VideoItem[] }) {
   const videoData = videos || []
+  const [activeVideo, setActiveVideo] = useState<VideoItem | null>(null)
   return (
     <section className="bg-frolick-darker py-10">
+      {/* Video Player Modal */}
+      {activeVideo && (
+        <div className="fixed inset-0 bg-black/90 z-50 flex items-center justify-center p-4" onClick={() => setActiveVideo(null)}>
+          <div className="w-full max-w-5xl" onClick={(e) => e.stopPropagation()}>
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="font-oswald font-bold text-xl text-white line-clamp-1">{activeVideo.title}</h2>
+              <button onClick={() => setActiveVideo(null)} className="text-white hover:text-frolick-yellow transition-colors p-2">
+                <X className="w-6 h-6" />
+              </button>
+            </div>
+            <div className="aspect-video rounded-xl overflow-hidden bg-black">
+              <iframe
+                src={`https://www.youtube.com/embed/${activeVideo.youtubeId}?autoplay=1&rel=0`}
+                title={activeVideo.title}
+                className="w-full h-full"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+              />
+            </div>
+            <div className="flex items-center gap-4 mt-3 text-gray-400 text-sm font-roboto">
+              <span className="flex items-center gap-1"><Clock className="w-4 h-4" />{activeVideo.duration}</span>
+              <span className="flex items-center gap-1"><Eye className="w-4 h-4" />{activeVideo.views} views</span>
+            </div>
+          </div>
+        </div>
+      )}
       <div className="max-w-7xl mx-auto px-4">
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-3">
@@ -352,7 +380,7 @@ export function VideoSection({ videos }: { videos?: VideoItem[] }) {
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           {videoData.map((video, i) => (
-            <div key={i} className="group cursor-pointer">
+            <div key={i} className="group cursor-pointer" onClick={() => setActiveVideo(video)}>
               <div className="relative rounded-lg overflow-hidden bg-frolick-charcoal aspect-video">
                 <img
                   src={video.image || latestArticles[i]?.image || '/images/hero-news.jpg'}

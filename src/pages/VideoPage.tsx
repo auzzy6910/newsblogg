@@ -1,21 +1,24 @@
+import { useState } from 'react'
 import { Link } from 'react-router-dom'
-import { Play, Eye, Clock } from 'lucide-react'
+import { Play, Eye, Clock, X } from 'lucide-react'
 import { videoItems } from '../data/newsData'
 import type { VideoItem } from '../data/newsData'
 
 const allVideos: VideoItem[] = [
   ...videoItems,
-  { title: "Federal Reserve Press Conference: Chair Powell Addresses Rate Decision", duration: "22:15", views: "1.5M", image: "/images/politics.jpg" },
-  { title: "Exclusive Interview: NASA Astronauts Describe Lunar Surface Experience", duration: "16:40", views: "3.8M", image: "/images/science.jpg" },
-  { title: "Global Water Crisis Documentary: The Fight for Earth's Most Precious Resource", duration: "45:12", views: "4.2M", image: "/images/hero-news.jpg" },
-  { title: "Cancer Vaccine Breakthrough: Scientists Explain How mRNA Technology Works", duration: "11:28", views: "2.6M", image: "/images/health.jpg" },
-  { title: "Oscar Winner Alejandra Gonzalez: From Mexico City to Hollywood Glory", duration: "13:55", views: "1.9M", image: "/images/entertainment.jpg" },
-  { title: "Infrastructure Bill Breakdown: What It Means for Your State", duration: "8:32", views: "980K", image: "/images/business.jpg" },
-  { title: "Peace Talks in Istanbul: Diplomatic Correspondent Reports from the Ground", duration: "10:18", views: "1.3M", image: "/images/world.jpg" },
-  { title: "Championship Parade: Fans Celebrate Historic Three-Peat Victory", duration: "7:45", views: "6.1M", image: "/images/sports.jpg" },
+  { title: "Federal Reserve Press Conference: Chair Powell Addresses Rate Decision", duration: "22:15", views: "1.5M", image: "/images/politics.jpg", youtubeId: "GGm0FQ6l9_I" },
+  { title: "Exclusive Interview: NASA Astronauts Describe Lunar Surface Experience", duration: "16:40", views: "3.8M", image: "/images/science.jpg", youtubeId: "nA9UZF-SZoQ" },
+  { title: "Global Water Crisis Documentary: The Fight for Earth's Most Precious Resource", duration: "45:12", views: "4.2M", image: "/images/hero-news.jpg", youtubeId: "C65iqOSCZOY" },
+  { title: "Cancer Vaccine Breakthrough: Scientists Explain How mRNA Technology Works", duration: "11:28", views: "2.6M", image: "/images/health.jpg", youtubeId: "z0kfdZ8o_j4" },
+  { title: "Oscar Winner Alejandra Gonzalez: From Mexico City to Hollywood Glory", duration: "13:55", views: "1.9M", image: "/images/entertainment.jpg", youtubeId: "wMWalKBmroU" },
+  { title: "Infrastructure Bill Breakdown: What It Means for Your State", duration: "8:32", views: "980K", image: "/images/business.jpg", youtubeId: "Hpk4MYqsoeI" },
+  { title: "Peace Talks in Istanbul: Diplomatic Correspondent Reports from the Ground", duration: "10:18", views: "1.3M", image: "/images/world.jpg", youtubeId: "1PmYIELRSzA" },
+  { title: "Championship Parade: Fans Celebrate Historic Three-Peat Victory", duration: "7:45", views: "6.1M", image: "/images/sports.jpg", youtubeId: "NFvbMPBgtGo" },
 ]
 
 export default function VideoPage() {
+  const [activeVideo, setActiveVideo] = useState<VideoItem | null>(null)
+
   return (
     <div className="bg-frolick-darker min-h-screen">
       <div className="max-w-7xl mx-auto px-4 py-8">
@@ -34,9 +37,42 @@ export default function VideoPage() {
           </h1>
         </div>
 
+        {/* Video Player Modal */}
+        {activeVideo && (
+          <div className="fixed inset-0 bg-black/90 z-50 flex items-center justify-center p-4" onClick={() => setActiveVideo(null)}>
+            <div className="w-full max-w-5xl" onClick={(e) => e.stopPropagation()}>
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="font-oswald font-bold text-xl text-white line-clamp-1">{activeVideo.title}</h2>
+                <button
+                  onClick={() => setActiveVideo(null)}
+                  className="text-white hover:text-frolick-yellow transition-colors p-2"
+                >
+                  <X className="w-6 h-6" />
+                </button>
+              </div>
+              <div className="aspect-video rounded-xl overflow-hidden bg-black">
+                <iframe
+                  src={`https://www.youtube.com/embed/${activeVideo.youtubeId}?autoplay=1&rel=0`}
+                  title={activeVideo.title}
+                  className="w-full h-full"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                />
+              </div>
+              <div className="flex items-center gap-4 mt-3 text-gray-400 text-sm font-roboto">
+                <span className="flex items-center gap-1"><Clock className="w-4 h-4" />{activeVideo.duration}</span>
+                <span className="flex items-center gap-1"><Eye className="w-4 h-4" />{activeVideo.views} views</span>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Featured Video */}
         <div className="mb-10">
-          <div className="group cursor-pointer relative rounded-xl overflow-hidden aspect-video max-h-[500px]">
+          <div
+            className="group cursor-pointer relative rounded-xl overflow-hidden aspect-video max-h-[500px]"
+            onClick={() => setActiveVideo(allVideos[0])}
+          >
             <img
               src={allVideos[0].image}
               alt={allVideos[0].title}
@@ -69,7 +105,7 @@ export default function VideoPage() {
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {allVideos.map((video, i) => (
-            <div key={i} className="group cursor-pointer">
+            <div key={i} className="group cursor-pointer" onClick={() => setActiveVideo(video)}>
               <div className="relative rounded-lg overflow-hidden bg-frolick-charcoal aspect-video">
                 <img
                   src={video.image}

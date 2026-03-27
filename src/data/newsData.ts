@@ -41,6 +41,7 @@ export interface VideoItem {
   duration: string
   views: string
   image: string
+  youtubeId: string
 }
 
 // ─── REAL NEWS DATA ─────────────────────────────────────────────────────────────
@@ -225,10 +226,10 @@ export const liveUpdates: LiveUpdate[] = [
 ]
 
 export const videoItems: VideoItem[] = [
-  { title: "Inside the UN Emergency Session: Delegates React to Water Crisis Data", duration: "14:22", views: "2.1M", image: "/images/world.jpg" },
-  { title: "AlphaFold 4 Explained: How AI Is Revolutionizing Drug Discovery", duration: "9:45", views: "1.8M", image: "/images/technology.jpg" },
-  { title: "Super Bowl LX Highlights: Mahomes' Greatest Plays in Three-Peat", duration: "6:18", views: "8.4M", image: "/images/sports.jpg" },
-  { title: "Artemis IV Moon Landing: Full Coverage of Historic EVA", duration: "18:34", views: "5.2M", image: "/images/science.jpg" },
+  { title: "Inside the UN Emergency Session: Delegates React to Water Crisis Data", duration: "14:22", views: "2.1M", image: "/images/world.jpg", youtubeId: "6m3-yY1rjFg" },
+  { title: "AlphaFold 4 Explained: How AI Is Revolutionizing Drug Discovery", duration: "9:45", views: "1.8M", image: "/images/technology.jpg", youtubeId: "7q8Aeio4mpA" },
+  { title: "Super Bowl LX Highlights: Mahomes' Greatest Plays in Three-Peat", duration: "6:18", views: "8.4M", image: "/images/sports.jpg", youtubeId: "tVxGhOeSLTk" },
+  { title: "Artemis IV Moon Landing: Full Coverage of Historic EVA", duration: "18:34", views: "5.2M", image: "/images/science.jpg", youtubeId: "RONIax0_1ec" },
 ]
 
 // ─── CATEGORY PAGE DATA ─────────────────────────────────────────────────────────
