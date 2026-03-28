@@ -2,7 +2,7 @@
 
 import { action } from "./_generated/server";
 import { v } from "convex/values";
-import OpenAI from "openai";
+import OpenAI, { APIError } from "openai";
 
 export const generateArticle = action({
   args: {
@@ -75,6 +75,29 @@ Respond ONLY with the JSON object, no additional text.`;
         },
       };
     } catch (error) {
+      if (error instanceof APIError) {
+        if (error.status === 429) {
+          return {
+            success: false,
+            error: "OpenAI quota exceeded. Please check your OpenAI billing and usage at platform.openai.com, or update the OPENAI_API_KEY in your Convex environment variables.",
+            errorCode: "QUOTA_EXCEEDED",
+          };
+        }
+        if (error.status === 401) {
+          return {
+            success: false,
+            error: "Invalid OpenAI API key. Please update the OPENAI_API_KEY in your Convex environment variables.",
+            errorCode: "INVALID_API_KEY",
+          };
+        }
+        if (error.status === 500 || error.status === 503) {
+          return {
+            success: false,
+            error: "OpenAI service is temporarily unavailable. Please try again in a few minutes.",
+            errorCode: "SERVICE_UNAVAILABLE",
+          };
+        }
+      }
       const errorMessage = error instanceof Error ? error.message : "Unknown error occurred";
       return {
         success: false,

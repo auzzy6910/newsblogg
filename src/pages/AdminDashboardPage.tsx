@@ -131,7 +131,16 @@ export default function AdminDashboardPage({ adminEmail, onLogout }: AdminDashbo
         }))
         showNotification('success', 'AI content generated! Review and edit before saving.')
       } else {
-        showNotification('error', result.error || 'AI generation failed')
+        const errorCode = (result as { errorCode?: string }).errorCode
+        if (errorCode === 'QUOTA_EXCEEDED') {
+          showNotification('error', 'OpenAI quota exceeded — please add credits at platform.openai.com or update your API key in Convex.')
+        } else if (errorCode === 'INVALID_API_KEY') {
+          showNotification('error', 'Invalid OpenAI API key — please update OPENAI_API_KEY in your Convex dashboard.')
+        } else if (errorCode === 'SERVICE_UNAVAILABLE') {
+          showNotification('error', 'OpenAI is temporarily unavailable — please try again in a few minutes.')
+        } else {
+          showNotification('error', result.error || 'AI generation failed')
+        }
       }
     } catch {
       showNotification('error', 'Failed to connect to AI service')
