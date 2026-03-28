@@ -11,6 +11,7 @@
 import type * as adminUsers from "../adminUsers.js";
 import type * as aiGenerate from "../aiGenerate.js";
 import type * as articles from "../articles.js";
+import type * as files from "../files.js";
 import type * as breakingNews from "../breakingNews.js";
 import type * as liveUpdates from "../liveUpdates.js";
 import type * as newsletter from "../newsletter.js";
@@ -29,6 +30,7 @@ declare const fullApi: ApiFromModules<{
   adminUsers: typeof adminUsers;
   aiGenerate: typeof aiGenerate;
   articles: typeof articles;
+  files: typeof files;
   breakingNews: typeof breakingNews;
   liveUpdates: typeof liveUpdates;
   newsletter: typeof newsletter;
