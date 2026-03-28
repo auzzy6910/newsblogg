@@ -11,6 +11,10 @@ import CareersPage from './pages/CareersPage'
 import AdvertisePage from './pages/AdvertisePage'
 import PressPage from './pages/PressPage'
 import LegalPage from './pages/LegalPage'
+import AdminWrapper from './pages/admin/AdminWrapper'
+import AdminDashboard from './pages/admin/AdminDashboard'
+import AdminPosts from './pages/admin/AdminPosts'
+import AdminPostEditor from './pages/admin/AdminPostEditor'
 import {
   Search,
   Menu,
@@ -879,7 +883,7 @@ function HomePage() {
   )
 }
 
-function App() {
+function PublicLayout() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
   return (
@@ -909,6 +913,23 @@ function App() {
       {/* Footer */}
       <Footer />
     </div>
+  )
+}
+
+function App() {
+  return (
+    <Routes>
+      {/* Admin routes - separate layout, no public header/footer */}
+      <Route path="/admin" element={<AdminWrapper />}>
+        <Route index element={<AdminDashboard />} />
+        <Route path="posts" element={<AdminPosts />} />
+        <Route path="posts/new" element={<AdminPostEditor />} />
+        <Route path="posts/:id/edit" element={<AdminPostEditor />} />
+      </Route>
+
+      {/* Public site routes */}
+      <Route path="/*" element={<PublicLayout />} />
+    </Routes>
   )
 }
 

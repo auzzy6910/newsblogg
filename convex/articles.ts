@@ -6,7 +6,15 @@ export const getHero = query({
   handler: async (ctx) => {
     const articles = await ctx.db
       .query("articles")
-      .filter((q) => q.eq(q.field("type"), "hero"))
+      .filter((q) =>
+        q.and(
+          q.eq(q.field("type"), "hero"),
+          q.or(
+            q.eq(q.field("status"), "published"),
+            q.eq(q.field("status"), undefined)
+          )
+        )
+      )
       .collect();
     return articles[0] ?? null;
   },
@@ -17,7 +25,15 @@ export const getFeatured = query({
   handler: async (ctx) => {
     return await ctx.db
       .query("articles")
-      .filter((q) => q.eq(q.field("type"), "featured"))
+      .filter((q) =>
+        q.and(
+          q.eq(q.field("type"), "featured"),
+          q.or(
+            q.eq(q.field("status"), "published"),
+            q.eq(q.field("status"), undefined)
+          )
+        )
+      )
       .collect();
   },
 });
@@ -27,7 +43,15 @@ export const getLatest = query({
   handler: async (ctx) => {
     return await ctx.db
       .query("articles")
-      .filter((q) => q.eq(q.field("type"), "latest"))
+      .filter((q) =>
+        q.and(
+          q.eq(q.field("type"), "latest"),
+          q.or(
+            q.eq(q.field("status"), "published"),
+            q.eq(q.field("status"), undefined)
+          )
+        )
+      )
       .collect();
   },
 });
@@ -35,7 +59,10 @@ export const getLatest = query({
 export const getAll = query({
   args: {},
   handler: async (ctx) => {
-    return await ctx.db.query("articles").collect();
+    const articles = await ctx.db.query("articles").collect();
+    return articles.filter(
+      (a) => a.status === "published" || a.status === undefined
+    );
   },
 });
 
