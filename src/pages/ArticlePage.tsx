@@ -1,7 +1,6 @@
 import { useParams, Link } from 'react-router-dom'
 import { useQuery } from 'convex/react'
 import { api } from '../../convex/_generated/api'
-import type { Id } from '../../convex/_generated/dataModel'
 import {
   ArrowLeft,
   Clock,
@@ -19,15 +18,11 @@ import { Helmet } from 'react-helmet-async'
 export default function ArticlePage() {
   const { id } = useParams<{ id: string }>()
 
-  const article = useQuery(
-    api.articles.getById,
-    id ? { id: id as Id<"articles"> } : "skip"
-  )
-
-  // Fetch related articles from same category
   const allArticles = useQuery(api.articles.getAll)
 
-  if (article === undefined) {
+  const article = allArticles?.find((a) => a._id === id) ?? null
+
+  if (allArticles === undefined) {
     return (
       <div className="flex items-center justify-center py-24">
         <Loader2 className="w-8 h-8 text-frolick-yellow animate-spin" />
@@ -52,7 +47,7 @@ export default function ArticlePage() {
     )
   }
 
-  const relatedArticles = (allArticles ?? [])
+  const relatedArticles = allArticles
     .filter((a) => a.category === article.category && a._id !== article._id)
     .slice(0, 3)
 
