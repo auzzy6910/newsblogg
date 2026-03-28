@@ -5,6 +5,7 @@ export default defineSchema({
   articles: defineTable({
     title: v.string(),
     excerpt: v.string(),
+    body: v.optional(v.string()),
     category: v.string(),
     image: v.string(),
     author: v.string(),

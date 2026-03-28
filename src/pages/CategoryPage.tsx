@@ -69,34 +69,36 @@ export default function CategoryPage() {
           {filtered.map((article) => {
             const imgFallback = `https://placehold.co/800x500/1A1A1A/FFD700/png?text=${article.category}`
             return (
-              <article key={article._id} className="group bg-white rounded-lg shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden border border-gray-100">
-                <div className="relative overflow-hidden">
-                  <img
-                    src={article.image}
-                    alt={article.title}
-                    className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-500"
-                    onError={(e) => { (e.target as HTMLImageElement).src = imgFallback }}
-                  />
-                  <div className="absolute top-3 left-3">
-                    <span className="bg-frolick-yellow text-frolick-dark text-xs font-oswald font-bold px-2 py-0.5 rounded-sm">
-                      {article.category}
-                    </span>
+              <Link key={article._id} to={`/article/${article._id}`} className="block">
+                <article className="group bg-white rounded-lg shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden border border-gray-100">
+                  <div className="relative overflow-hidden">
+                    <img
+                      src={article.image}
+                      alt={article.title}
+                      className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-500"
+                      onError={(e) => { (e.target as HTMLImageElement).src = imgFallback }}
+                    />
+                    <div className="absolute top-3 left-3">
+                      <span className="bg-frolick-yellow text-frolick-dark text-xs font-oswald font-bold px-2 py-0.5 rounded-sm">
+                        {article.category}
+                      </span>
+                    </div>
                   </div>
-                </div>
-                <div className="p-4">
-                  <h3 className="font-oswald font-semibold text-lg text-frolick-dark leading-tight group-hover:text-frolick-yellow-dark transition-colors cursor-pointer">
-                    {article.title}
-                  </h3>
-                  <p className="text-sm text-gray-600 font-roboto mt-2 line-clamp-2 leading-relaxed">
-                    {article.excerpt}
-                  </p>
-                  <div className="flex items-center gap-3 mt-3 pt-3 border-t border-gray-100 text-xs text-gray-500 font-roboto">
-                    <span className="font-medium text-frolick-dark">{article.author}</span>
-                    <span className="flex items-center gap-1"><Clock className="w-3 h-3" />{article.time}</span>
-                    <span className="flex items-center gap-1"><MessageSquare className="w-3 h-3" />{article.comments}</span>
+                  <div className="p-4">
+                    <h3 className="font-oswald font-semibold text-lg text-frolick-dark leading-tight group-hover:text-frolick-yellow-dark transition-colors">
+                      {article.title}
+                    </h3>
+                    <p className="text-sm text-gray-600 font-roboto mt-2 line-clamp-2 leading-relaxed">
+                      {article.excerpt}
+                    </p>
+                    <div className="flex items-center gap-3 mt-3 pt-3 border-t border-gray-100 text-xs text-gray-500 font-roboto">
+                      <span className="font-medium text-frolick-dark">{article.author}</span>
+                      <span className="flex items-center gap-1"><Clock className="w-3 h-3" />{article.time}</span>
+                      <span className="flex items-center gap-1"><MessageSquare className="w-3 h-3" />{article.comments}</span>
+                    </div>
                   </div>
-                </div>
-              </article>
+                </article>
+              </Link>
             )
           })}
         </div>

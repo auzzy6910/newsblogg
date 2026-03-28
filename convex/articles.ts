@@ -32,6 +32,13 @@ export const getLatest = query({
   },
 });
 
+export const getById = query({
+  args: { id: v.id("articles") },
+  handler: async (ctx, args) => {
+    return await ctx.db.get(args.id);
+  },
+});
+
 export const getAll = query({
   args: {},
   handler: async (ctx) => {
@@ -53,6 +60,7 @@ export const create = mutation({
   args: {
     title: v.string(),
     excerpt: v.string(),
+    body: v.optional(v.string()),
     category: v.string(),
     image: v.string(),
     author: v.string(),
@@ -78,6 +86,7 @@ export const update = mutation({
     id: v.id("articles"),
     title: v.optional(v.string()),
     excerpt: v.optional(v.string()),
+    body: v.optional(v.string()),
     category: v.optional(v.string()),
     image: v.optional(v.string()),
     author: v.optional(v.string()),

@@ -13,6 +13,7 @@ import PressPage from './pages/PressPage'
 import LegalPage from './pages/LegalPage'
 import NotFoundPage from './pages/NotFoundPage'
 import AdminPortal from './pages/AdminPortal'
+import ArticlePage from './pages/ArticlePage'
 import {
   Search,
   Menu,
@@ -319,88 +320,94 @@ function ArticleCard({ article, compactId, variant = 'default' }: { article: Art
 
   if (variant === 'horizontal') {
     return (
-      <article className="group flex gap-4 p-4 bg-white rounded-lg shadow-sm hover:shadow-md transition-all duration-300 border border-gray-100">
-        <div className="relative w-40 h-28 shrink-0 overflow-hidden rounded">
-          <img
-            src={article.image}
-            alt={article.title}
-            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-            onError={(e) => { (e.target as HTMLImageElement).src = imgFallback }}
-          />
-          {article.isLive && (
-            <div className="absolute top-2 left-2 bg-frolick-red text-white text-xs font-oswald px-1.5 py-0.5 rounded-sm animate-pulse flex items-center gap-1">
-              <span className="w-1.5 h-1.5 bg-white rounded-full" />
-              LIVE
+      <Link to={`/article/${article._id}`} className="block">
+        <article className="group flex gap-4 p-4 bg-white rounded-lg shadow-sm hover:shadow-md transition-all duration-300 border border-gray-100">
+          <div className="relative w-40 h-28 shrink-0 overflow-hidden rounded">
+            <img
+              src={article.image}
+              alt={article.title}
+              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+              onError={(e) => { (e.target as HTMLImageElement).src = imgFallback }}
+            />
+            {article.isLive && (
+              <div className="absolute top-2 left-2 bg-frolick-red text-white text-xs font-oswald px-1.5 py-0.5 rounded-sm animate-pulse flex items-center gap-1">
+                <span className="w-1.5 h-1.5 bg-white rounded-full" />
+                LIVE
+              </div>
+            )}
+          </div>
+          <div className="flex flex-col justify-between flex-1 min-w-0">
+            <div>
+              <CategoryBadge category={article.category} isExclusive={article.isExclusive} />
+              <h3 className="font-oswald font-semibold text-frolick-dark mt-1 text-base leading-tight group-hover:text-frolick-yellow-dark transition-colors line-clamp-2">
+                {article.title}
+              </h3>
             </div>
-          )}
-        </div>
-        <div className="flex flex-col justify-between flex-1 min-w-0">
-          <div>
-            <CategoryBadge category={article.category} isExclusive={article.isExclusive} />
-            <h3 className="font-oswald font-semibold text-frolick-dark mt-1 text-base leading-tight group-hover:text-frolick-yellow-dark transition-colors line-clamp-2">
-              {article.title}
-            </h3>
+            <div className="flex items-center gap-3 text-xs text-gray-500 font-roboto mt-2">
+              <span>{article.author}</span>
+              <span className="flex items-center gap-1"><Clock className="w-3 h-3" />{article.time}</span>
+              <span className="flex items-center gap-1"><MessageSquare className="w-3 h-3" />{article.comments}</span>
+            </div>
           </div>
-          <div className="flex items-center gap-3 text-xs text-gray-500 font-roboto mt-2">
-            <span>{article.author}</span>
-            <span className="flex items-center gap-1"><Clock className="w-3 h-3" />{article.time}</span>
-            <span className="flex items-center gap-1"><MessageSquare className="w-3 h-3" />{article.comments}</span>
-          </div>
-        </div>
-      </article>
+        </article>
+      </Link>
     )
   }
 
   if (variant === 'compact') {
     return (
-      <article className="group flex items-start gap-3 py-3 border-b border-gray-100 last:border-0">
-          <div className="bg-frolick-yellow text-frolick-dark font-oswald font-bold text-lg w-8 h-8 flex items-center justify-center rounded shrink-0">
-            {compactId ?? 1}
+      <Link to={`/article/${article._id}`} className="block">
+        <article className="group flex items-start gap-3 py-3 border-b border-gray-100 last:border-0">
+            <div className="bg-frolick-yellow text-frolick-dark font-oswald font-bold text-lg w-8 h-8 flex items-center justify-center rounded shrink-0">
+              {compactId ?? 1}
+            </div>
+          <div>
+            <span className="text-xs font-oswald text-frolick-yellow-dark font-semibold">{article.category}</span>
+            <h4 className="font-roboto font-medium text-sm text-frolick-dark leading-snug group-hover:text-frolick-yellow-dark transition-colors">
+              {article.title}
+            </h4>
+            <span className="text-xs text-gray-400 font-roboto mt-1 block">{article.time}</span>
           </div>
-        <div>
-          <span className="text-xs font-oswald text-frolick-yellow-dark font-semibold">{article.category}</span>
-          <h4 className="font-roboto font-medium text-sm text-frolick-dark leading-snug group-hover:text-frolick-yellow-dark transition-colors cursor-pointer">
-            {article.title}
-          </h4>
-          <span className="text-xs text-gray-400 font-roboto mt-1 block">{article.time}</span>
-        </div>
-      </article>
+        </article>
+      </Link>
     )
   }
 
   return (
-    <article className="group bg-white rounded-lg shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden border border-gray-100">
-      <div className="relative overflow-hidden">
-        <img
-          src={article.image}
-          alt={article.title}
-          className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-500"
-          onError={(e) => { (e.target as HTMLImageElement).src = imgFallback }}
-        />
-        <div className="absolute top-3 left-3">
-          <CategoryBadge category={article.category} isLive={article.isLive} isBreaking={article.isBreaking} isExclusive={article.isExclusive} />
-        </div>
-        <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent h-20" />
-      </div>
-      <div className="p-4">
-        <h3 className="font-oswald font-semibold text-lg text-frolick-dark leading-tight group-hover:text-frolick-yellow-dark transition-colors cursor-pointer">
-          {article.title}
-        </h3>
-        <p className="text-sm text-gray-600 font-roboto mt-2 line-clamp-2 leading-relaxed">
-          {article.excerpt}
-        </p>
-        <div className="flex items-center justify-between mt-3 pt-3 border-t border-gray-100">
-          <div className="flex items-center gap-3 text-xs text-gray-500 font-roboto">
-            <span className="font-medium text-frolick-dark">{article.author}</span>
-            <span className="flex items-center gap-1"><Clock className="w-3 h-3" />{article.readTime}</span>
+    <Link to={`/article/${article._id}`} className="block">
+      <article className="group bg-white rounded-lg shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden border border-gray-100">
+        <div className="relative overflow-hidden">
+          <img
+            src={article.image}
+            alt={article.title}
+            className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-500"
+            onError={(e) => { (e.target as HTMLImageElement).src = imgFallback }}
+          />
+          <div className="absolute top-3 left-3">
+            <CategoryBadge category={article.category} isLive={article.isLive} isBreaking={article.isBreaking} isExclusive={article.isExclusive} />
           </div>
-          <div className="flex items-center gap-2">
-            <button className="text-gray-400 hover:text-frolick-yellow-dark transition-colors"><Bookmark className="w-4 h-4" /></button>
-            <button className="text-gray-400 hover:text-frolick-yellow-dark transition-colors"><Share2 className="w-4 h-4" /></button>
+          <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent h-20" />
+        </div>
+        <div className="p-4">
+          <h3 className="font-oswald font-semibold text-lg text-frolick-dark leading-tight group-hover:text-frolick-yellow-dark transition-colors">
+            {article.title}
+          </h3>
+          <p className="text-sm text-gray-600 font-roboto mt-2 line-clamp-2 leading-relaxed">
+            {article.excerpt}
+          </p>
+          <div className="flex items-center justify-between mt-3 pt-3 border-t border-gray-100">
+            <div className="flex items-center gap-3 text-xs text-gray-500 font-roboto">
+              <span className="font-medium text-frolick-dark">{article.author}</span>
+              <span className="flex items-center gap-1"><Clock className="w-3 h-3" />{article.readTime}</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <button className="text-gray-400 hover:text-frolick-yellow-dark transition-colors"><Bookmark className="w-4 h-4" /></button>
+              <button className="text-gray-400 hover:text-frolick-yellow-dark transition-colors"><Share2 className="w-4 h-4" /></button>
+            </div>
           </div>
         </div>
-      </div>
-    </article>
+      </article>
+    </Link>
   )
 }
 
@@ -418,53 +425,57 @@ function HeroSection() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Main Hero */}
           <div className="lg:col-span-2">
-            <article className="group relative rounded-xl overflow-hidden shadow-2xl cursor-pointer">
-              <img
-                src={heroArticle.image}
-                alt={heroArticle.title}
-                className="w-full h-72 md:h-96 lg:h-full object-cover group-hover:scale-105 transition-transform duration-700"
-                onError={(e) => { (e.target as HTMLImageElement).src = imgFallback }}
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent" />
-              <div className="absolute bottom-0 left-0 right-0 p-6 md:p-8">
-                <CategoryBadge category={heroArticle.category} isBreaking={heroArticle.isBreaking} />
-                <h2 className="font-oswald font-bold text-2xl md:text-3xl lg:text-4xl text-white mt-3 leading-tight drop-shadow-lg">
-                  {heroArticle.title}
-                </h2>
-                <p className="text-gray-200 font-roboto text-sm md:text-base mt-3 max-w-2xl leading-relaxed line-clamp-2">
-                  {heroArticle.excerpt}
-                </p>
-                <div className="flex items-center gap-4 mt-4 text-gray-300 text-sm font-roboto">
-                  <span className="text-frolick-yellow font-medium">{heroArticle.author}</span>
-                  <span className="flex items-center gap-1"><Clock className="w-4 h-4" />{heroArticle.time}</span>
-                  <span className="flex items-center gap-1"><MessageSquare className="w-4 h-4" />{heroArticle.comments} comments</span>
+            <Link to={`/article/${heroArticle._id}`}>
+              <article className="group relative rounded-xl overflow-hidden shadow-2xl cursor-pointer">
+                <img
+                  src={heroArticle.image}
+                  alt={heroArticle.title}
+                  className="w-full h-72 md:h-96 lg:h-full object-cover group-hover:scale-105 transition-transform duration-700"
+                  onError={(e) => { (e.target as HTMLImageElement).src = imgFallback }}
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent" />
+                <div className="absolute bottom-0 left-0 right-0 p-6 md:p-8">
+                  <CategoryBadge category={heroArticle.category} isBreaking={heroArticle.isBreaking} />
+                  <h2 className="font-oswald font-bold text-2xl md:text-3xl lg:text-4xl text-white mt-3 leading-tight drop-shadow-lg">
+                    {heroArticle.title}
+                  </h2>
+                  <p className="text-gray-200 font-roboto text-sm md:text-base mt-3 max-w-2xl leading-relaxed line-clamp-2">
+                    {heroArticle.excerpt}
+                  </p>
+                  <div className="flex items-center gap-4 mt-4 text-gray-300 text-sm font-roboto">
+                    <span className="text-frolick-yellow font-medium">{heroArticle.author}</span>
+                    <span className="flex items-center gap-1"><Clock className="w-4 h-4" />{heroArticle.time}</span>
+                    <span className="flex items-center gap-1"><MessageSquare className="w-4 h-4" />{heroArticle.comments} comments</span>
+                  </div>
+                  <span className="mt-4 flex items-center gap-2 text-frolick-yellow font-oswald font-semibold text-sm hover:text-white transition-colors">
+                    READ FULL STORY <ArrowRight className="w-4 h-4" />
+                  </span>
                 </div>
-                <button className="mt-4 flex items-center gap-2 text-frolick-yellow font-oswald font-semibold text-sm hover:text-white transition-colors">
-                  READ FULL STORY <ArrowRight className="w-4 h-4" />
-                </button>
-              </div>
-            </article>
+              </article>
+            </Link>
           </div>
 
           {/* Side stories */}
           <div className="flex flex-col gap-4">
             {(featuredArticles ?? []).slice(0, 3).map((article) => (
-              <article key={article._id} className="group relative rounded-lg overflow-hidden shadow-lg cursor-pointer flex-1">
-                <img
-                  src={article.image}
-                  alt={article.title}
-                  className="w-full h-full min-h-36 object-cover group-hover:scale-105 transition-transform duration-500"
-                  onError={(e) => { (e.target as HTMLImageElement).src = `https://placehold.co/400x250/1A1A1A/FFD700/png?text=${article.category}` }}
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black via-black/30 to-transparent" />
-                <div className="absolute bottom-0 left-0 right-0 p-4">
-                  <CategoryBadge category={article.category} isLive={article.isLive} isExclusive={article.isExclusive} />
-                  <h3 className="font-oswald font-semibold text-base text-white mt-2 leading-tight line-clamp-2 drop-shadow">
-                    {article.title}
-                  </h3>
-                  <span className="text-gray-300 text-xs font-roboto mt-1 block">{article.time}</span>
-                </div>
-              </article>
+              <Link key={article._id} to={`/article/${article._id}`} className="flex-1">
+                <article className="group relative rounded-lg overflow-hidden shadow-lg cursor-pointer h-full">
+                  <img
+                    src={article.image}
+                    alt={article.title}
+                    className="w-full h-full min-h-36 object-cover group-hover:scale-105 transition-transform duration-500"
+                    onError={(e) => { (e.target as HTMLImageElement).src = `https://placehold.co/400x250/1A1A1A/FFD700/png?text=${article.category}` }}
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black via-black/30 to-transparent" />
+                  <div className="absolute bottom-0 left-0 right-0 p-4">
+                    <CategoryBadge category={article.category} isLive={article.isLive} isExclusive={article.isExclusive} />
+                    <h3 className="font-oswald font-semibold text-base text-white mt-2 leading-tight line-clamp-2 drop-shadow">
+                      {article.title}
+                    </h3>
+                    <span className="text-gray-300 text-xs font-roboto mt-1 block">{article.time}</span>
+                  </div>
+                </article>
+              </Link>
             ))}
           </div>
         </div>
@@ -898,6 +909,7 @@ function MainLayout() {
       {/* Routes */}
       <Routes>
         <Route path="/" element={<HomePage />} />
+        <Route path="/article/:id" element={<ArticlePage />} />
         <Route path="/category/:slug" element={<CategoryPage />} />
         <Route path="/shows/:slug" element={<ShowPage />} />
         <Route path="/about" element={<AboutPage />} />
