@@ -61,4 +61,12 @@ export default defineSchema({
     email: v.string(),
     subscribedAt: v.number(),
   }).index("by_email", ["email"]),
+
+  adminUsers: defineTable({
+    email: v.string(),
+    passwordHash: v.string(),
+    isAdmin: v.boolean(),
+    name: v.string(),
+    createdAt: v.number(),
+  }).index("by_email", ["email"]),
 });

@@ -11,6 +11,8 @@ import CareersPage from './pages/CareersPage'
 import AdvertisePage from './pages/AdvertisePage'
 import PressPage from './pages/PressPage'
 import LegalPage from './pages/LegalPage'
+import NotFoundPage from './pages/NotFoundPage'
+import AdminPortal from './pages/AdminPortal'
 import {
   Search,
   Menu,
@@ -879,7 +881,7 @@ function HomePage() {
   )
 }
 
-function App() {
+function MainLayout() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
   return (
@@ -904,11 +906,23 @@ function App() {
         <Route path="/advertise" element={<AdvertisePage />} />
         <Route path="/press" element={<PressPage />} />
         <Route path="/legal/:slug" element={<LegalPage />} />
+        <Route path="*" element={<NotFoundPage />} />
       </Routes>
 
       {/* Footer */}
       <Footer />
     </div>
+  )
+}
+
+function App() {
+  return (
+    <Routes>
+      {/* Admin portal — completely separate from main layout */}
+      <Route path="/portal-manager-77" element={<AdminPortal />} />
+      {/* Main site layout */}
+      <Route path="/*" element={<MainLayout />} />
+    </Routes>
   )
 }
 
