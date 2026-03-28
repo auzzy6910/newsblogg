@@ -19,6 +19,9 @@ export default defineSchema({
       v.literal("featured"),
       v.literal("latest")
     ),
+    status: v.optional(v.union(v.literal("draft"), v.literal("published"))),
+    body: v.optional(v.string()),
+    seoKeywords: v.optional(v.array(v.string())),
   }).searchIndex("search_title", {
     searchField: "title",
     filterFields: ["category", "type"],
