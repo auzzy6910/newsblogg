@@ -11,6 +11,7 @@ import CareersPage from './pages/CareersPage'
 import AdvertisePage from './pages/AdvertisePage'
 import PressPage from './pages/PressPage'
 import LegalPage from './pages/LegalPage'
+import AdminPage from './pages/AdminPage'
 import {
   Search,
   Menu,
@@ -904,6 +905,7 @@ function App() {
         <Route path="/advertise" element={<AdvertisePage />} />
         <Route path="/press" element={<PressPage />} />
         <Route path="/legal/:slug" element={<LegalPage />} />
+        <Route path="/admin" element={<AdminPage />} />
       </Routes>
 
       {/* Footer */}

@@ -8,34 +8,46 @@ export const getHero = query({
       .query("articles")
       .filter((q) => q.eq(q.field("type"), "hero"))
       .collect();
-    return articles[0] ?? null;
+    const published = articles.filter(
+      (a) => a.status === "published" || a.status === undefined
+    );
+    return published[0] ?? null;
   },
 });
 
 export const getFeatured = query({
   args: {},
   handler: async (ctx) => {
-    return await ctx.db
+    const articles = await ctx.db
       .query("articles")
       .filter((q) => q.eq(q.field("type"), "featured"))
       .collect();
+    return articles.filter(
+      (a) => a.status === "published" || a.status === undefined
+    );
   },
 });
 
 export const getLatest = query({
   args: {},
   handler: async (ctx) => {
-    return await ctx.db
+    const articles = await ctx.db
       .query("articles")
       .filter((q) => q.eq(q.field("type"), "latest"))
       .collect();
+    return articles.filter(
+      (a) => a.status === "published" || a.status === undefined
+    );
   },
 });
 
 export const getAll = query({
   args: {},
   handler: async (ctx) => {
-    return await ctx.db.query("articles").collect();
+    const articles = await ctx.db.query("articles").collect();
+    return articles.filter(
+      (a) => a.status === "published" || a.status === undefined
+    );
   },
 });
 
