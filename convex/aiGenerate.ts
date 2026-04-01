@@ -14,11 +14,14 @@ export const generateArticle = action({
     if (!apiKey) {
       return {
         success: false,
-        error: "OpenAI API key is not configured. Please set OPENAI_API_KEY in your Convex environment variables.",
+        error: "OpenRouter API key is not configured. Please set OPENAI_API_KEY in your Convex environment variables.",
       };
     }
 
-    const openai = new OpenAI({ apiKey });
+    const openai = new OpenAI({
+      apiKey,
+      baseURL: "https://openrouter.ai/api/v1",
+    });
 
     const prompt = `You are a professional news editor. Generate a complete news article based on the following information.
 
