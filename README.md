@@ -11,14 +11,14 @@ A full-stack news blog application built with React, TypeScript, Vite, and Conve
 - **Build Tool:** Vite
 - **Linting:** ESLint
 
-Backend is managed via Convex at https://rare-elephant-985.convex.cloud. Database schema and functions are located in `/convex`.
+Backend is managed via Convex at https://secret-aardvark-456.convex.cloud. Database schema and functions are located in `/convex`.
 
 ## Backend
 
 The backend is powered by [Convex](https://convex.dev) and is hosted at:
 
-- **Convex Backend URL:** https://rare-elephant-985.convex.cloud
-- **Convex Dashboard:** https://dashboard.convex.dev/d/rare-elephant-985
+- **Convex Backend URL:** https://secret-aardvark-456.convex.cloud
+- **Convex Dashboard:** https://dashboard.convex.dev/d/secret-aardvark-456
 
 ## Getting Started
 
@@ -44,7 +44,7 @@ cp .env.example .env.local
 The `.env.local` file should contain:
 
 ```
-VITE_CONVEX_URL=https://rare-elephant-985.convex.cloud
+VITE_CONVEX_URL=https://secret-aardvark-456.convex.cloud
 ```
 
 ### Running the App
