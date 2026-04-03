@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useRef } from 'react'
 import { useQuery, useMutation, useAction } from 'convex/react'
 import { api } from '../../convex/_generated/api'
 import type { Id } from '../../convex/_generated/dataModel'
@@ -19,6 +19,8 @@ import {
   FileText,
   AlertCircle,
   CheckCircle,
+  Upload,
+  ImageIcon,
 } from 'lucide-react'
 import { Helmet } from 'react-helmet-async'
 import ReactQuill from 'react-quill-new'
@@ -94,12 +96,15 @@ export default function AdminDashboardPage({ adminEmail, onLogout }: AdminDashbo
   const [notification, setNotification] = useState<{ type: 'success' | 'error'; message: string } | null>(null)
   const [seoTagInput, setSeoTagInput] = useState('')
   const [editingId, setEditingId] = useState<string | null>(null)
+  const [isUploading, setIsUploading] = useState(false)
+  const imageInputRef = useRef<HTMLInputElement>(null)
 
   const articles = useQuery(api.articles.getAll)
   const createArticle = useMutation(api.articles.create)
   const updateArticle = useMutation(api.articles.update)
   const removeArticle = useMutation(api.articles.remove)
   const generateArticle = useAction(api.aiGenerate.generateArticle)
+  const generateUploadUrl = useMutation(api.files.generateUploadUrl)
 
   const showNotification = useCallback((type: 'success' | 'error', message: string) => {
     setNotification({ type, message })
@@ -131,7 +136,16 @@ export default function AdminDashboardPage({ adminEmail, onLogout }: AdminDashbo
         }))
         showNotification('success', 'AI content generated! Review and edit before saving.')
       } else {
-        showNotification('error', result.error || 'AI generation failed')
+        const errorCode = (result as { errorCode?: string }).errorCode
+        if (errorCode === 'QUOTA_EXCEEDED') {
+          showNotification('error', 'OpenAI quota exceeded — please add credits at platform.openai.com or update your API key in Convex.')
+        } else if (errorCode === 'INVALID_API_KEY') {
+          showNotification('error', 'Invalid OpenAI API key — please update OPENAI_API_KEY in your Convex dashboard.')
+        } else if (errorCode === 'SERVICE_UNAVAILABLE') {
+          showNotification('error', 'OpenAI is temporarily unavailable — please try again in a few minutes.')
+        } else {
+          showNotification('error', result.error || 'AI generation failed')
+        }
       }
     } catch {
       showNotification('error', 'Failed to connect to AI service')
@@ -221,6 +235,46 @@ export default function AdminDashboardPage({ adminEmail, onLogout }: AdminDashbo
     })
     setEditingId(article._id)
     setView('create')
+  }
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+
+    if (!file.type.startsWith('image/')) {
+      showNotification('error', 'Please select a valid image file (PNG, JPG, GIF, WebP)')
+      return
+    }
+
+    if (file.size > 5 * 1024 * 1024) {
+      showNotification('error', 'Image must be less than 5MB')
+      return
+    }
+
+    setIsUploading(true)
+    try {
+      const uploadUrl = await generateUploadUrl()
+      const result = await fetch(uploadUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': file.type },
+        body: file,
+      })
+      const { storageId } = await result.json()
+
+      // Construct the Convex storage serving URL
+      const deploymentUrl = (import.meta.env.VITE_CONVEX_URL || '').replace('wss://', 'https://')
+      const storageUrl = `${deploymentUrl}/api/storage/${storageId}`
+
+      setForm((prev) => ({ ...prev, image: storageUrl }))
+      showNotification('success', 'Image uploaded successfully!')
+    } catch {
+      showNotification('error', 'Failed to upload image. Please try again.')
+    } finally {
+      setIsUploading(false)
+      if (imageInputRef.current) {
+        imageInputRef.current.value = ''
+      }
+    }
   }
 
   const addSeoTag = () => {
@@ -596,14 +650,70 @@ export default function AdminDashboardPage({ adminEmail, onLogout }: AdminDashbo
                       </div>
 
                       <div>
-                        <label className="block text-gray-600 text-xs font-roboto mb-1">Image URL</label>
-                        <input
-                          type="text"
-                          value={form.image}
-                          onChange={(e) => setForm((prev) => ({ ...prev, image: e.target.value }))}
-                          placeholder="https://..."
-                          className="w-full border border-gray-200 rounded px-3 py-2 font-roboto text-sm focus:outline-none focus:border-frolick-yellow"
-                        />
+                        <label className="block text-gray-600 text-xs font-roboto mb-1">Preview Image</label>
+                        <div className="space-y-2">
+                          <input
+                            ref={imageInputRef}
+                            type="file"
+                            accept="image/*"
+                            onChange={handleImageUpload}
+                            className="hidden"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => imageInputRef.current?.click()}
+                            disabled={isUploading}
+                            className="w-full flex items-center justify-center gap-2 border-2 border-dashed border-gray-300 rounded-lg px-3 py-3 text-sm font-roboto text-gray-500 hover:border-frolick-yellow hover:text-frolick-dark transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                          >
+                            {isUploading ? (
+                              <>
+                                <Loader2 className="w-4 h-4 animate-spin" />
+                                Uploading...
+                              </>
+                            ) : (
+                              <>
+                                <Upload className="w-4 h-4" />
+                                Upload Image
+                              </>
+                            )}
+                          </button>
+                          <div className="relative">
+                            <input
+                              type="text"
+                              value={form.image}
+                              onChange={(e) => setForm((prev) => ({ ...prev, image: e.target.value }))}
+                              placeholder="Or paste an image URL..."
+                              className="w-full border border-gray-200 rounded px-3 py-2 font-roboto text-sm focus:outline-none focus:border-frolick-yellow"
+                            />
+                            {form.image && (
+                              <button
+                                type="button"
+                                onClick={() => setForm((prev) => ({ ...prev, image: '' }))}
+                                className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-frolick-red transition-colors"
+                              >
+                                <X className="w-3.5 h-3.5" />
+                              </button>
+                            )}
+                          </div>
+                          {form.image && (
+                            <div className="relative border border-gray-200 rounded overflow-hidden">
+                              <img
+                                src={form.image}
+                                alt="Preview"
+                                className="w-full h-24 object-cover"
+                                onError={(e) => {
+                                  (e.target as HTMLImageElement).style.display = 'none'
+                                  const fallback = (e.target as HTMLImageElement).nextElementSibling as HTMLElement
+                                  if (fallback) fallback.style.display = 'flex'
+                                }}
+                              />
+                              <div className="hidden items-center justify-center h-24 bg-gray-50 text-gray-400 text-xs font-roboto gap-1">
+                                <ImageIcon className="w-4 h-4" />
+                                Failed to load image
+                              </div>
+                            </div>
+                          )}
+                        </div>
                       </div>
                     </div>
                   </div>
